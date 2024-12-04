@@ -138,3 +138,4 @@ if st.button("Calculate"):
     # Error handling if no valid input is given
     if total_columns == 0 or total_length == 0:
         st.warning("Please ensure all input values are greater than zero.")
+
