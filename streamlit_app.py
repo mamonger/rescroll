@@ -73,12 +73,15 @@ characters_per_line = st.number_input("Characters per Line:", min_value=1, value
 column_width_cm = st.number_input("Column Width (cm):", min_value=0.1, value=10.0, step=0.1)
 right_margin = st.number_input("Right Margin Before First Column (cm):", min_value=0.0, value=1.0, step=0.1)
 left_margin = st.number_input("Left Margin After Last Column (cm):", min_value=0.0, value=1.0, step=0.1)
-inter_column_margin = st.number_input("Margin Between Columns (cm):", min_value=0.0, value=0.5, step=0.1)
+inter_column_margin = st.number_input("Margin Between Columns (cm):", min_value=0.1, value=1.4, step=0.1)
 
 # Calculate button
 if st.button("Calculate"):
     # Get the character count for the selected book
     total_characters = character_counts_with_spaces.get(book)
+
+    # Use the default inter_column_margin of 1.4 cm if no value is provided
+    inter_column_margin = inter_column_margin if inter_column_margin else 1.4
 
     # Perform the calculation
     total_columns, total_length = calculate_columns_and_length(
