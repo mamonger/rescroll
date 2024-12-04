@@ -100,15 +100,9 @@ def plot_layout(total_columns, column_width_cm, right_margin, left_margin, inter
 
         # Draw inter-column margin
         if i < total_columns - 1:
-            ax.add_patch(
-                patches.Rectangle(
-                    (x, 3),
-                    inter_column_margin,
-                    4,
-                    edgecolor=None,
-                    facecolor="#f4f4f9",
-                )
-            )
+            ax.plot([x, x], [3, 7], linestyle="dotted", color="gray", linewidth=1.5)
+            ax.plot([x + inter_column_margin, x + inter_column_margin], [3, 7], linestyle="dotted", color="gray", linewidth=1.5)
+            ax.fill_betweenx([3, 7], x, x + inter_column_margin, color="#f4f4f9", alpha=0.5, label="Inter-column Margin" if i == 0 else None)
             x += inter_column_margin
 
     # Draw left margin with dotted lines
@@ -121,13 +115,19 @@ def plot_layout(total_columns, column_width_cm, right_margin, left_margin, inter
     ax.text(x + left_margin / 2, 8, f"{left_margin} cm", ha="center", fontsize=10, color="brown")
     ax.text(total_length_cm / 2, 1, f"Total Length: {total_length_cm:.2f} cm", ha="center", fontsize=12, color="blue")
 
+    # Add inter-column margin labels
+    x = right_margin + column_width_cm
+    for i in range(int(total_columns) - 1):
+        ax.text(x + inter_column_margin / 2, 6, f"{inter_column_margin} cm", ha="center", fontsize=8, color="gray")
+        x += column_width_cm + inter_column_margin
+
     # Remove axes for a clean look
     ax.axis("off")
 
     return fig
 
 # Streamlit UI
-st.title("Ancient Manuscript Length Calculator (Scaled & Enhanced)")
+st.title("Ancient Manuscript Length Calculator (Inter-Column Margins Included)")
 
 # Input Fields
 book = st.selectbox("Select Book:", list(character_counts_with_spaces.keys()))
