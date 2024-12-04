@@ -1,5 +1,6 @@
 import streamlit as st
 import matplotlib.pyplot as plt
+import matplotlib.patches as patches
 
 # Hebrew character counts for all books of the Hebrew Bible, including spaces (approx. 20% added)
 character_counts_with_spaces = {
@@ -66,39 +67,46 @@ def calculate_columns_and_length(total_characters, lines_per_column, characters_
 
 def plot_layout(total_columns, column_width_cm, right_margin, left_margin, inter_column_margin, total_length_cm):
     """
-    Generate a visualization of the manuscript layout.
+    Generate an enhanced visualization of the manuscript layout.
     """
-    fig, ax = plt.subplots(figsize=(10, 2))
-    
-    # Set up the total length as the width of the image
+    fig, ax = plt.subplots(figsize=(12, 2.5))
     ax.set_xlim(0, total_length_cm)
     ax.set_ylim(0, 10)
 
-    # Draw the margins and columns
+    # Background color
+    ax.set_facecolor("#f4f4f9")
+
+    # Draw right margin
+    ax.add_patch(patches.Rectangle((0, 3), right_margin, 4, edgecolor=None, facecolor="#d9d9d9", label="Right Margin"))
+
+    # Draw columns and inter-column margins
     x = right_margin
     for i in range(int(total_columns)):
-        # Draw column
-        ax.add_patch(plt.Rectangle((x, 3), column_width_cm, 4, edgecolor='black', facecolor='lightgray'))
+        # Draw column with gradient-like color
+        color = plt.cm.Blues(0.5 + 0.5 * (i / total_columns))  # Gradient effect
+        ax.add_patch(patches.Rectangle((x, 3), column_width_cm, 4, edgecolor="black", facecolor=color, label="Column" if i == 0 else None))
         x += column_width_cm
-        if i < total_columns - 1:
-            # Add inter-column margin
-            x += inter_column_margin
-    
-    # Add right margin
-    x += left_margin
 
-    # Add labels for dimensions
-    ax.text(right_margin / 2, 8, f"Right Margin\n{right_margin} cm", ha='center', fontsize=8)
-    ax.text(total_length_cm - left_margin / 2, 8, f"Left Margin\n{left_margin} cm", ha='center', fontsize=8)
-    ax.text(total_length_cm / 2, 1, f"Total Length: {total_length_cm} cm", ha='center', fontsize=10, color='blue')
+        # Draw inter-column margin
+        if i < total_columns - 1:
+            ax.add_patch(patches.Rectangle((x, 3), inter_column_margin, 4, edgecolor=None, facecolor="#f4f4f9"))
+            x += inter_column_margin
+
+    # Draw left margin
+    ax.add_patch(patches.Rectangle((x, 3), left_margin, 4, edgecolor=None, facecolor="#d9d9d9", label="Left Margin"))
+
+    # Add labels
+    ax.text(right_margin / 2, 8, f"{right_margin} cm", ha="center", fontsize=10, color="black")
+    ax.text(x + left_margin / 2 - left_margin, 8, f"{left_margin} cm", ha="center", fontsize=10, color="black")
+    ax.text(total_length_cm / 2, 1, f"Total Length: {total_length_cm:.2f} cm", ha="center", fontsize=12, color="blue")
 
     # Remove axes for a clean look
-    ax.axis('off')
+    ax.axis("off")
 
     return fig
 
 # Streamlit UI
-st.title("Ancient Manuscript Length Calculator (With Visualization)")
+st.title("Ancient Manuscript Length Calculator (Sexy Visualization)")
 
 # Input Fields
 book = st.selectbox("Select Book:", list(character_counts_with_spaces.keys()))
@@ -130,7 +138,7 @@ if st.button("Calculate"):
     st.write(f"**Total Columns:** {total_columns}")
     st.write(f"**Total Length:** {total_length} cm")
 
-    # Generate and display visualization
+    # Generate and display enhanced visualization
     if total_columns > 0 and total_length > 0:
         fig = plot_layout(total_columns, column_width_cm, right_margin, left_margin, inter_column_margin, total_length)
         st.pyplot(fig)
@@ -138,4 +146,3 @@ if st.button("Calculate"):
     # Error handling if no valid input is given
     if total_columns == 0 or total_length == 0:
         st.warning("Please ensure all input values are greater than zero.")
-
