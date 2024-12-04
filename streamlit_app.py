@@ -67,37 +67,58 @@ def calculate_columns_and_length(total_characters, lines_per_column, characters_
 
 def plot_layout(total_columns, column_width_cm, right_margin, left_margin, inter_column_margin, total_length_cm):
     """
-    Generate an enhanced visualization of the manuscript layout.
+    Generate an enhanced visualization of the manuscript layout with cafe au lait coloring,
+    proportional scaling, and dotted lines for margins.
     """
-    fig, ax = plt.subplots(figsize=(12, 2.5))
+    fig, ax = plt.subplots(figsize=(10, 2))  # Adjust figure size for scaling
     ax.set_xlim(0, total_length_cm)
     ax.set_ylim(0, 10)
 
     # Background color
     ax.set_facecolor("#f4f4f9")
 
-    # Draw right margin
-    ax.add_patch(patches.Rectangle((0, 3), right_margin, 4, edgecolor=None, facecolor="#d9d9d9", label="Right Margin"))
+    # Draw right margin with dotted lines
+    ax.plot([0, 0], [3, 7], linestyle="dotted", color="brown", linewidth=1.5)
+    ax.plot([right_margin, right_margin], [3, 7], linestyle="dotted", color="brown", linewidth=1.5)
+    ax.fill_betweenx([3, 7], 0, right_margin, color="#d9d9d9", alpha=0.5, label="Right Margin")
 
     # Draw columns and inter-column margins
     x = right_margin
     for i in range(int(total_columns)):
-        # Draw column with gradient-like color
-        color = plt.cm.Blues(0.5 + 0.5 * (i / total_columns))  # Gradient effect
-        ax.add_patch(patches.Rectangle((x, 3), column_width_cm, 4, edgecolor="black", facecolor=color, label="Column" if i == 0 else None))
+        # Draw column with cafe au lait color
+        ax.add_patch(
+            patches.Rectangle(
+                (x, 3),
+                column_width_cm,
+                4,
+                edgecolor="black",
+                facecolor="#d2b48c",
+                label="Column" if i == 0 else None,
+            )
+        )
         x += column_width_cm
 
         # Draw inter-column margin
         if i < total_columns - 1:
-            ax.add_patch(patches.Rectangle((x, 3), inter_column_margin, 4, edgecolor=None, facecolor="#f4f4f9"))
+            ax.add_patch(
+                patches.Rectangle(
+                    (x, 3),
+                    inter_column_margin,
+                    4,
+                    edgecolor=None,
+                    facecolor="#f4f4f9",
+                )
+            )
             x += inter_column_margin
 
-    # Draw left margin
-    ax.add_patch(patches.Rectangle((x, 3), left_margin, 4, edgecolor=None, facecolor="#d9d9d9", label="Left Margin"))
+    # Draw left margin with dotted lines
+    ax.plot([x, x], [3, 7], linestyle="dotted", color="brown", linewidth=1.5)
+    ax.plot([x + left_margin, x + left_margin], [3, 7], linestyle="dotted", color="brown", linewidth=1.5)
+    ax.fill_betweenx([3, 7], x, x + left_margin, color="#d9d9d9", alpha=0.5, label="Left Margin")
 
-    # Add labels
-    ax.text(right_margin / 2, 8, f"{right_margin} cm", ha="center", fontsize=10, color="black")
-    ax.text(x + left_margin / 2 - left_margin, 8, f"{left_margin} cm", ha="center", fontsize=10, color="black")
+    # Add labels for dimensions
+    ax.text(right_margin / 2, 8, f"{right_margin} cm", ha="center", fontsize=10, color="brown")
+    ax.text(x + left_margin / 2, 8, f"{left_margin} cm", ha="center", fontsize=10, color="brown")
     ax.text(total_length_cm / 2, 1, f"Total Length: {total_length_cm:.2f} cm", ha="center", fontsize=12, color="blue")
 
     # Remove axes for a clean look
@@ -106,7 +127,7 @@ def plot_layout(total_columns, column_width_cm, right_margin, left_margin, inter
     return fig
 
 # Streamlit UI
-st.title("Ancient Manuscript Length Calculator (Sexy Visualization)")
+st.title("Ancient Manuscript Length Calculator (Scaled & Enhanced)")
 
 # Input Fields
 book = st.selectbox("Select Book:", list(character_counts_with_spaces.keys()))
@@ -130,7 +151,7 @@ if st.button("Calculate"):
         column_width_cm,
         right_margin,
         left_margin,
-        inter_column_margin
+        inter_column_margin,
     )
 
     # Display Results
