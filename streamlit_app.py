@@ -1,6 +1,4 @@
 import streamlit as st
-import matplotlib.pyplot as plt
-import matplotlib.patches as patches
 
 # Hebrew character counts for all books of the Hebrew Bible, including spaces (approx. 20% added)
 character_counts_with_spaces = {
@@ -64,3 +62,40 @@ def calculate_columns_and_length(total_characters, lines_per_column, characters_
         return round(total_columns, 2), round(total_length_cm, 2)
     except ZeroDivisionError:
         return 0, 0
+
+# Streamlit UI
+st.title("Ancient Manuscript Length Calculator")
+
+# Input Fields
+book = st.selectbox("Select Book:", list(character_counts_with_spaces.keys()))
+lines_per_column = st.number_input("Lines per Column:", min_value=1, value=40, step=1)
+characters_per_line = st.number_input("Characters per Line:", min_value=1, value=30, step=1)
+column_width_cm = st.number_input("Column Width (cm):", min_value=0.1, value=10.0, step=0.1)
+right_margin = st.number_input("Right Margin Before First Column (cm):", min_value=0.0, value=1.0, step=0.1)
+left_margin = st.number_input("Left Margin After Last Column (cm):", min_value=0.0, value=1.0, step=0.1)
+inter_column_margin = st.number_input("Margin Between Columns (cm):", min_value=0.0, value=0.5, step=0.1)
+
+# Calculate button
+if st.button("Calculate"):
+    # Get the character count for the selected book
+    total_characters = character_counts_with_spaces.get(book)
+
+    # Perform the calculation
+    total_columns, total_length = calculate_columns_and_length(
+        total_characters,
+        lines_per_column,
+        characters_per_line,
+        column_width_cm,
+        right_margin,
+        left_margin,
+        inter_column_margin,
+    )
+
+    # Display Results
+    st.subheader(f"Results for {book}")
+    st.write(f"**Total Columns:** {total_columns}")
+    st.write(f"**Total Length:** {total_length} cm")
+
+    # Error handling if no valid input is given
+    if total_columns == 0 or total_length == 0:
+        st.warning("Please ensure all input values are greater than zero.")
