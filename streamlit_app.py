@@ -64,7 +64,7 @@ def calculate_columns_and_length(total_characters, lines_per_column, characters_
         return 0, 0
 
 # Streamlit UI
-st.title("Ancient Manuscript Length Calculator (Including Spaces)")
+st.title("Hebrew Bible Manuscript Length Calculator")
 
 # Input Fields
 book = st.selectbox("Select Book:", list(character_counts_with_spaces.keys()))
