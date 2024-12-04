@@ -1,45 +1,46 @@
 import streamlit as st
+import matplotlib.pyplot as plt
 
 # Hebrew character counts for all books of the Hebrew Bible, including spaces (approx. 20% added)
 character_counts_with_spaces = {
-    "Genesis": 93677,  # 78,064 + 20%
-    "Exodus": 76442,   # 63,702 + 20%
-    "Leviticus": 53747,  # 44,789 + 20%
-    "Numbers": 69294,   # 57,745 + 20%
-    "Deuteronomy": 62882,  # 52,402 + 20%
-    "Joshua": 34053,    # 28,378 + 20%
-    "Judges": 33034,    # 27,528 + 20%
-    "Ruth": 12222,      # 10,185 + 20%
-    "1 Samuel": 45854,  # 38,212 + 20%
-    "2 Samuel": 42058,  # 35,048 + 20%
-    "1 Kings": 41453,   # 34,544 + 20%
-    "2 Kings": 36980,   # 30,817 + 20%
-    "Isaiah": 80242,    # 66,868 + 20%
-    "Jeremiah": 83238,  # 69,365 + 20%
-    "Ezekiel": 69086,   # 57,572 + 20%
-    "Hosea": 14350,     # 11,958 + 20%
-    "Joel": 3643,       # 3,036 + 20%
-    "Amos": 6353,       # 5,294 + 20%
-    "Obadiah": 1238,    # 1,032 + 20%
-    "Jonah": 2357,      # 1,964 + 20%
-    "Micah": 5079,      # 4,233 + 20%
-    "Nahum": 1943,      # 1,619 + 20%
-    "Habakkuk": 2620,   # 2,184 + 20%
-    "Zephaniah": 2972,  # 2,477 + 20%
-    "Haggai": 1657,     # 1,381 + 20%
-    "Zechariah": 7274,  # 6,062 + 20%
-    "Malachi": 2117,    # 1,764 + 20%
-    "Psalms": 180209,   # 150,174 + 20%
-    "Proverbs": 57924,  # 48,270 + 20%
-    "Job": 47882,       # 39,902 + 20%
-    "Song of Songs": 6822,  # 5,685 + 20%
-    "Ecclesiastes": 27847,  # 23,206 + 20%
-    "Lamentations": 17395,  # 14,496 + 20%
-    "Daniel": 25644,    # 21,370 + 20%
-    "Ezra": 16922,      # 14,102 + 20%
-    "Nehemiah": 23548,  # 19,623 + 20%
-    "1 Chronicles": 44990,  # 37,492 + 20%
-    "2 Chronicles": 47799,  # 39,833 + 20%
+    "Genesis": 93677,
+    "Exodus": 76442,
+    "Leviticus": 53747,
+    "Numbers": 69294,
+    "Deuteronomy": 62882,
+    "Joshua": 34053,
+    "Judges": 33034,
+    "Ruth": 12222,
+    "1 Samuel": 45854,
+    "2 Samuel": 42058,
+    "1 Kings": 41453,
+    "2 Kings": 36980,
+    "Isaiah": 80242,
+    "Jeremiah": 83238,
+    "Ezekiel": 69086,
+    "Hosea": 14350,
+    "Joel": 3643,
+    "Amos": 6353,
+    "Obadiah": 1238,
+    "Jonah": 2357,
+    "Micah": 5079,
+    "Nahum": 1943,
+    "Habakkuk": 2620,
+    "Zephaniah": 2972,
+    "Haggai": 1657,
+    "Zechariah": 7274,
+    "Malachi": 2117,
+    "Psalms": 180209,
+    "Proverbs": 57924,
+    "Job": 47882,
+    "Song of Songs": 6822,
+    "Ecclesiastes": 27847,
+    "Lamentations": 17395,
+    "Daniel": 25644,
+    "Ezra": 16922,
+    "Nehemiah": 23548,
+    "1 Chronicles": 44990,
+    "2 Chronicles": 47799,
 }
 
 def calculate_columns_and_length(total_characters, lines_per_column, characters_per_line, column_width_cm, right_margin, left_margin, inter_column_margin):
@@ -63,8 +64,41 @@ def calculate_columns_and_length(total_characters, lines_per_column, characters_
     except ZeroDivisionError:
         return 0, 0
 
+def plot_layout(total_columns, column_width_cm, right_margin, left_margin, inter_column_margin, total_length_cm):
+    """
+    Generate a visualization of the manuscript layout.
+    """
+    fig, ax = plt.subplots(figsize=(10, 2))
+    
+    # Set up the total length as the width of the image
+    ax.set_xlim(0, total_length_cm)
+    ax.set_ylim(0, 10)
+
+    # Draw the margins and columns
+    x = right_margin
+    for i in range(int(total_columns)):
+        # Draw column
+        ax.add_patch(plt.Rectangle((x, 3), column_width_cm, 4, edgecolor='black', facecolor='lightgray'))
+        x += column_width_cm
+        if i < total_columns - 1:
+            # Add inter-column margin
+            x += inter_column_margin
+    
+    # Add right margin
+    x += left_margin
+
+    # Add labels for dimensions
+    ax.text(right_margin / 2, 8, f"Right Margin\n{right_margin} cm", ha='center', fontsize=8)
+    ax.text(total_length_cm - left_margin / 2, 8, f"Left Margin\n{left_margin} cm", ha='center', fontsize=8)
+    ax.text(total_length_cm / 2, 1, f"Total Length: {total_length_cm} cm", ha='center', fontsize=10, color='blue')
+
+    # Remove axes for a clean look
+    ax.axis('off')
+
+    return fig
+
 # Streamlit UI
-st.title("Hebrew Bible Manuscript Length Calculator")
+st.title("Ancient Manuscript Length Calculator (With Visualization)")
 
 # Input Fields
 book = st.selectbox("Select Book:", list(character_counts_with_spaces.keys()))
@@ -95,6 +129,11 @@ if st.button("Calculate"):
     st.subheader(f"Results for {book}")
     st.write(f"**Total Columns:** {total_columns}")
     st.write(f"**Total Length:** {total_length} cm")
+
+    # Generate and display visualization
+    if total_columns > 0 and total_length > 0:
+        fig = plot_layout(total_columns, column_width_cm, right_margin, left_margin, inter_column_margin, total_length)
+        st.pyplot(fig)
 
     # Error handling if no valid input is given
     if total_columns == 0 or total_length == 0:
